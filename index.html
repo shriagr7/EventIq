@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EventIQ · Demand Signal Engine — Techment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,400&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0d1b2a;
+    --ink-2:#33475b;
+    --ink-3:#647587;
+    --paper:#f5f6f2;
+    --paper-2:#eef0ea;
+    --panel:#ffffff;
+    --line:#dde2db;
+    --grid:#eef1ec;
+    --signal:#127555;
+    --signal-bright:#20c489;
+    --signal-deep:#0c5a41;
+    --gold:#a9791f;
+    --gold-bg:#fbf4e2;
+    --alert:#bd5334;
+    --sky:#2f6db0;
+    --hi:#f4faf6;
+    --hi-hover:#eef8f1;
+    --shadow-sm:0 1px 2px rgba(13,27,42,.04);
+    --shadow:0 1px 2px rgba(13,27,42,.05),0 10px 34px rgba(13,27,42,.07);
+    --shadow-lg:0 2px 6px rgba(13,27,42,.08),0 24px 60px rgba(13,27,42,.16);
+    --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+    --serif:"Fraunces",Georgia,serif;
+    --sans:"Inter",system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    font-family:var(--sans);
+    background:
+      radial-gradient(1200px 420px at 82% -8%, rgba(18,117,85,.05), transparent 60%),
+      radial-gradient(900px 360px at 8% -6%, rgba(47,109,176,.045), transparent 62%),
+      var(--paper);
+    color:var(--ink);
+    line-height:1.55;
+    padding:clamp(14px,3.4vw,44px);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1460px;margin:0 auto}
+
+  /* ============ MASTHEAD ============ */
+  .masthead{
+    display:flex;align-items:center;justify-content:space-between;gap:24px;
+    padding-bottom:20px;margin-bottom:24px;
+    border-bottom:1.5px solid var(--ink);
+  }
+
+  /* ---- EventIQ logo (left) : radar / signal-lock mark ---- */
+  .brand{display:flex;align-items:center;gap:15px;min-width:0}
+  .radar{width:62px;height:62px;flex:none;display:block}
+  .radar .ring{fill:none;stroke:var(--signal);opacity:.32}
+  .radar .ring.r2{opacity:.2}
+  .radar .ring.r3{opacity:.12}
+  .radar .cross{stroke:var(--signal);opacity:.22;stroke-width:1}
+  .radar .sweep{transform-origin:32px 32px;animation:sweep 4.6s linear infinite}
+  .radar .pip{fill:var(--gold)}
+  .radar .pip-halo{fill:none;stroke:var(--gold);transform-origin:44px 24px;animation:ping 2.8s ease-out infinite}
+  @keyframes sweep{to{transform:rotate(360deg)}}
+  @keyframes ping{0%{r:2;opacity:.9}70%{r:11;opacity:0}100%{r:11;opacity:0}}
+  .lockup{min-width:0}
+  .wordmark{
+    font-family:var(--serif);font-weight:600;font-size:29px;letter-spacing:-.02em;
+    line-height:1;color:var(--ink);display:flex;align-items:baseline;gap:1px;
+  }
+  .wordmark .iq{color:var(--signal);font-style:italic}
+  .tagline{
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ink-3);margin-top:6px;
+  }
+
+  /* ---- Techment logo (right) — actual asset ---- */
+  .partner{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex:none}
+  .partner-lbl{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-3)}
+  .tm-logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+  .tm-mark{height:40px;width:auto;flex:none;display:block}
+  .tm-word{font-family:var(--serif);font-weight:500;font-size:23px;letter-spacing:-.01em;color:var(--ink);line-height:1}
+  .tm-word b{font-weight:700}
+  .tm-logo:hover .tm-word{color:var(--signal)}
+
+  /* ============ TITLE BLOCK ============ */
+  .titleblock{margin-bottom:22px}
+  .status{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--signal);font-weight:600;display:inline-flex;align-items:center;gap:9px;
+  }
+  .live-dot{width:7px;height:7px;border-radius:50%;background:var(--signal-bright);flex:none;
+    box-shadow:0 0 0 0 rgba(32,196,137,.5);animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(32,196,137,.45)}70%{box-shadow:0 0 0 8px rgba(32,196,137,0)}100%{box-shadow:0 0 0 0 rgba(32,196,137,0)}}
+  h1{
+    font-family:var(--serif);font-weight:400;font-size:clamp(29px,4.6vw,48px);
+    line-height:1.03;letter-spacing:-.022em;margin:13px 0 10px;max-width:20ch;
+  }
+  h1 em{font-style:italic;color:var(--signal)}
+  .sub{color:var(--ink-2);font-size:clamp(14px,1.7vw,16px);max-width:74ch;line-height:1.6}
+
+  /* ============ COMMAND BAR (Process button) ============ */
+  .command-bar{
+    display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+    margin-top:22px;padding:18px 20px;
+    background:linear-gradient(180deg,#0f2436,#0d1b2a);
+    border:1px solid #16324a;border-radius:14px;
+    box-shadow:var(--shadow);
+  }
+  .cmd-left{display:flex;align-items:center;gap:16px;min-width:0;flex:1 1 320px}
+  .cmd-icon{
+    width:44px;height:44px;flex:none;border-radius:10px;
+    background:rgba(32,196,137,.12);border:1px solid rgba(32,196,137,.32);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .cmd-icon svg{width:24px;height:24px}
+  .cmd-copy .cmd-title{font-family:var(--serif);font-size:18px;font-weight:600;color:#f2f6f4;letter-spacing:-.01em;line-height:1.15}
+  .cmd-copy .cmd-desc{font-family:var(--mono);font-size:10.5px;color:#8fa6b5;letter-spacing:.02em;margin-top:4px;line-height:1.5}
+
+  .process-btn{
+    flex:none;display:inline-flex;align-items:center;gap:11px;
+    font-family:var(--sans);font-weight:600;font-size:15px;letter-spacing:.01em;
+    color:#04120c;
+    background:linear-gradient(180deg,var(--signal-bright),#12a774);
+    border:1px solid rgba(255,255,255,.14);
+    padding:13px 26px;border-radius:10px;cursor:pointer;
+    box-shadow:0 1px 0 rgba(255,255,255,.28) inset,0 8px 22px rgba(18,117,85,.4);
+    transition:transform .12s ease,box-shadow .18s ease,filter .18s ease;
+    position:relative;overflow:hidden;
+  }
+  .process-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 1px 0 rgba(255,255,255,.28) inset,0 12px 30px rgba(18,117,85,.52);filter:brightness(1.04)}
+  .process-btn:active:not(:disabled){transform:translateY(0)}
+  .process-btn:focus-visible{outline:2px solid var(--signal-bright);outline-offset:3px}
+  .process-btn:disabled{cursor:not-allowed;filter:saturate(.55) brightness(.92);opacity:.85}
+  .process-btn .pb-ic{width:19px;height:19px;flex:none;display:flex;align-items:center;justify-content:center}
+  .process-btn .pb-ic svg{width:19px;height:19px}
+  .process-btn.is-running{background:linear-gradient(180deg,#1a4a5f,#123a4d);color:#cfe6dd}
+  .process-btn.is-done{background:linear-gradient(180deg,#2f6db0,#255a94);color:#eef4fb}
+  /* shimmer while running */
+  .process-btn.is-running::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);
+    transform:translateX(-100%);animation:shimmer 1.5s infinite;
+  }
+  @keyframes shimmer{to{transform:translateX(100%)}}
+  .spinner{width:18px;height:18px;border-radius:50%;border:2.4px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .7s linear infinite;flex:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* ============ PIPELINE PROGRESS PANEL ============ */
+  .pipeline{
+    margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--panel);
+    box-shadow:var(--shadow);overflow:hidden;
+    max-height:0;opacity:0;transform:translateY(-6px);
+    transition:max-height .5s cubic-bezier(.2,.7,.2,1),opacity .4s ease,transform .4s ease,margin-top .4s ease;
+  }
+  .pipeline.open{max-height:920px;opacity:1;transform:translateY(0)}
+  .pl-head{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:16px 20px;border-bottom:1px solid var(--grid);
+    background:linear-gradient(180deg,#fbfcfb,#f7f9f6);
+  }
+  .pl-head .pl-h-left{display:flex;align-items:center;gap:11px}
+  .pl-head .pl-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+  .pl-mode{font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:3px 9px;border-radius:5px;font-weight:600;
+    background:var(--gold-bg);color:#8a6410;border:1px solid #e6d5a6}
+  .pl-elapsed{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.03em}
+  .pl-elapsed b{color:var(--signal);font-weight:700}
+
+  /* overall progress track */
+  .pl-progress{padding:14px 20px 6px}
+  .pl-bar{height:8px;border-radius:6px;background:var(--grid);overflow:hidden;position:relative}
+  .pl-bar > i{display:block;height:100%;width:0;border-radius:6px;
+    background:linear-gradient(90deg,var(--signal),var(--signal-bright));
+    transition:width .5s cubic-bezier(.2,.7,.2,1)}
+  .pl-pct{display:flex;justify-content:space-between;margin-top:7px;font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.03em}
+  .pl-pct b{color:var(--ink);font-weight:700}
+
+  /* agent steps */
+  .pl-steps{padding:8px 20px 18px;display:grid;gap:2px}
+  .step{
+    display:grid;grid-template-columns:26px 1fr auto;align-items:start;gap:13px;
+    padding:11px 12px;border-radius:9px;transition:background .2s ease;
+  }
+  .step.active{background:var(--hi)}
+  .step.done{opacity:1}
+  .step.pending{opacity:.5}
+  .step-ic{
+    width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:11px;font-weight:700;
+    border:1.5px solid var(--line);color:var(--ink-3);background:var(--panel);margin-top:1px;
+    transition:all .25s ease;
+  }
+  .step.active .step-ic{border-color:var(--signal);color:var(--signal);box-shadow:0 0 0 4px rgba(18,117,85,.1)}
+  .step.done .step-ic{background:var(--signal);border-color:var(--signal);color:#fff}
+  .step-body{min-width:0}
+  .step-name{font-size:13.5px;font-weight:600;color:var(--ink);letter-spacing:-.005em;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .step-agent{font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);
+    padding:2px 7px;border:1px solid var(--line);border-radius:4px;font-weight:600}
+  .step.active .step-agent{color:var(--signal);border-color:#bfe0d0;background:var(--hi)}
+  .step-log{font-family:var(--mono);font-size:11px;color:var(--ink-3);margin-top:5px;line-height:1.5;letter-spacing:.01em;min-height:16px}
+  .step.active .step-log{color:var(--ink-2)}
+  .step-log .cursor{display:inline-block;width:7px;height:13px;background:var(--signal);vertical-align:text-bottom;margin-left:2px;animation:blink 1s step-end infinite}
+  @keyframes blink{50%{opacity:0}}
+  .step-stat{font-family:var(--mono);font-size:11px;color:var(--ink-3);white-space:nowrap;text-align:right;padding-top:1px;min-width:64px}
+  .step-stat b{color:var(--signal);font-weight:700;font-size:13px}
+  .step.active .mini-spin{width:13px;height:13px;border:2px solid var(--grid);border-top-color:var(--signal);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle}
+  .check{width:13px;height:13px;display:inline-block;vertical-align:middle}
+
+  .pl-foot{
+    padding:13px 20px;border-top:1px solid var(--grid);background:var(--hi);
+    display:none;align-items:center;gap:11px;font-size:12.5px;color:var(--ink-2);
+  }
+  .pl-foot.show{display:flex}
+  .pl-foot .chk{width:22px;height:22px;border-radius:50%;background:var(--signal);display:flex;align-items:center;justify-content:center;flex:none}
+  .pl-foot b{color:var(--ink);font-weight:600}
+  .pl-foot .jump{margin-left:auto;font-family:var(--mono);font-size:10.5px;color:var(--signal);cursor:pointer;text-decoration:none;letter-spacing:.03em;border:1px solid #bfe0d0;padding:6px 12px;border-radius:6px;background:var(--panel);transition:all .15s}
+  .pl-foot .jump:hover{background:var(--signal);color:#fff;border-color:var(--signal)}
+
+  /* ============ META STRIP ============ */
+  .meta-strip{
+    display:flex;flex-wrap:wrap;gap:0;margin-top:22px;
+    border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel);
+    box-shadow:var(--shadow-sm);
+  }
+  .meta-cell{flex:1 1 auto;min-width:132px;padding:11px 16px;border-right:1px solid var(--line)}
+  .meta-cell:last-child{border-right:none}
+  .meta-cell .k{font-family:var(--mono);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-3)}
+  .meta-cell .v{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);margin-top:3px;letter-spacing:-.01em}
+  .meta-cell .v .sig{color:var(--signal)}
+
+  /* ============ TOOLBAR ============ */
+  .toolbar{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;margin:26px 0 13px}
+  .filters{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  .fbtn{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;font-weight:500;
+    padding:7px 13px;border-radius:6px;border:1px solid var(--line);background:var(--panel);
+    color:var(--ink-2);cursor:pointer;transition:all .14s ease;display:inline-flex;align-items:center;gap:7px;
+  }
+  .fbtn:hover{border-color:var(--signal);color:var(--ink)}
+  .fbtn.active{background:var(--ink);color:#eef4f0;border-color:var(--ink)}
+  .fbtn .swatch{width:8px;height:8px;border-radius:2px;flex:none}
+  .fbtn.active .swatch{outline:1.5px solid rgba(255,255,255,.4);outline-offset:1px}
+  .sw-ms{background:var(--signal)} .sw-data{background:var(--sky)} .sw-ind{background:var(--gold)} .sw-all{background:linear-gradient(135deg,var(--signal),var(--sky) 55%,var(--gold))}
+  .fbtn .ct{opacity:.6;font-size:9.5px}
+  .hint{font-family:var(--mono);font-size:10px;color:var(--ink-3);letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+  .hint .k{background:var(--panel);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 6px;font-size:9.5px;color:var(--ink-2)}
+
+  /* ============ TABLE ============ */
+  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--panel);box-shadow:var(--shadow)}
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1300px;font-size:13px}
+  thead th{
+    position:sticky;top:0;z-index:3;background:var(--ink);color:#dfe8e3;
+    font-family:var(--mono);font-weight:500;font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+    text-align:left;padding:14px 13px;white-space:nowrap;
+  }
+  thead th:first-child{border-top-left-radius:12px}
+  thead th:last-child{border-top-right-radius:12px}
+  thead th.center{text-align:center}
+  thead th .th-rank{color:var(--signal-bright)}
+  tbody td{padding:15px 13px;border-bottom:1px solid var(--grid);vertical-align:top}
+  tbody tr{cursor:pointer;transition:background .12s ease}
+  tbody tr:hover{background:var(--hi-hover)}
+  tbody tr.hidden{display:none}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover .evname{color:var(--signal)}
+  tbody tr:hover .evname .arw{opacity:1;transform:translate(2px,-2px)}
+  /* reveal animation when rows are injected by pipeline */
+  tbody tr.reveal{animation:rowIn .45s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+  .sno{font-family:var(--mono);font-size:12px;color:var(--ink-3);text-align:center;font-weight:600;padding-top:16px}
+  .rk{font-family:var(--mono);font-size:12px;color:var(--ink-3);text-align:center;font-weight:600;padding-top:17px}
+  .rk .medal{color:var(--gold)}
+
+  .evcell{min-width:230px;max-width:270px}
+  .evname{font-family:var(--serif);font-size:16px;font-weight:600;letter-spacing:-.012em;line-height:1.2;color:var(--ink);display:inline-flex;align-items:baseline;gap:5px}
+  .evname .arw{font-family:var(--mono);font-size:12px;color:var(--signal);opacity:0;transition:all .14s ease;flex:none}
+  .evsub{font-size:11.5px;color:var(--ink-3);margin-top:4px;line-height:1.4}
+  .access{
+    display:inline-flex;align-items:center;gap:5px;margin-top:9px;
+    font-family:var(--mono);font-size:9px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;
+    padding:3px 8px;border-radius:5px;
+  }
+  .access.a-yes{background:var(--gold-bg);border:1px solid #e6d5a6;color:#8a6410}
+  .access.a-part{background:var(--hi);border:1px solid #bfe0d0;color:var(--signal)}
+  .access.a-no{background:#f3f4f2;border:1px solid var(--line);color:var(--ink-3)}
+  .access .star{font-size:11px;line-height:1}
+
+  .focus{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;color:var(--ink);font-weight:500}
+  .fdot{width:8px;height:8px;border-radius:2px;flex:none}
+  .fdot.ms{background:var(--signal)} .fdot.data{background:var(--sky)} .fdot.ind{background:var(--gold)}
+  .fsub{display:block;font-family:var(--sans);font-size:10.5px;color:var(--ink-3);margin-top:3px;font-weight:400;letter-spacing:0;padding-left:15px}
+
+  .when{font-family:var(--mono);font-size:12px;white-space:nowrap}
+  .when .mo{font-weight:600;color:var(--signal)}
+  .when .dt{color:var(--ink-3);display:block;margin-top:3px;font-size:11px}
+
+  .geo{font-size:12.5px;color:var(--ink);white-space:nowrap;font-weight:500}
+  .loc{font-size:11px;color:var(--ink-3);margin-top:3px;white-space:nowrap;font-family:var(--sans)}
+
+  .price{font-family:var(--mono);font-size:11.5px;color:var(--ink);white-space:nowrap}
+  .price.free{color:var(--signal);font-weight:700}
+
+  .att{font-family:var(--mono);font-size:13px;color:var(--ink);white-space:nowrap;font-weight:700;text-align:center}
+  .att small{display:block;font-size:9px;color:var(--ink-3);font-weight:400;margin-top:2px;letter-spacing:.04em}
+
+  .people{font-size:11.5px;color:var(--ink-2);line-height:1.5;min-width:158px;max-width:200px}
+  .comp{font-size:11px;color:var(--alert);line-height:1.45;min-width:120px;max-width:158px}
+  .comp .warn{font-weight:600}
+
+  .webcell{white-space:nowrap}
+  .weblink{font-family:var(--mono);font-size:11px;color:var(--signal);text-decoration:none;display:inline-flex;align-items:center;gap:5px;font-weight:600}
+  .weblink:hover{text-decoration:underline}
+  .weblink .lk{width:12px;height:12px;flex:none}
+
+  /* Fit score — radar arc echo */
+  .score-cell{text-align:center;white-space:nowrap;min-width:98px}
+  .gauge{position:relative;width:74px;height:74px;margin:0 auto}
+  .gauge svg{transform:rotate(-90deg)}
+  .gauge .track{fill:none;stroke:var(--grid);stroke-width:6}
+  .gauge .fill{fill:none;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1s cubic-bezier(.2,.7,.2,1)}
+  .gauge .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;font-family:var(--mono)}
+  .gauge .num b{font-size:19px;font-weight:700;color:var(--ink);line-height:1}
+  .gauge .num i{font-size:8px;color:var(--ink-3);font-style:normal;letter-spacing:.08em;margin-top:1px}
+  .fill.hi{stroke:var(--signal-bright)} .fill.mid{stroke:var(--gold)} .fill.lo{stroke:var(--alert)}
+  .tier{font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;margin-top:7px;font-weight:600}
+  .tier.hi{color:var(--signal)} .tier.mid{color:var(--gold)} .tier.lo{color:var(--alert)}
+
+  .remark{font-size:11.5px;color:var(--ink-2);line-height:1.55;min-width:220px;max-width:290px}
+  .remark b{color:var(--ink);font-weight:600}
+  .remark .lead{color:var(--signal);font-weight:600}
+
+  /* empty state before processing */
+  .empty-state{
+    padding:56px 24px;text-align:center;
+  }
+  .empty-state .es-mark{width:56px;height:56px;margin:0 auto 18px;opacity:.5}
+  .empty-state h3{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink);margin-bottom:8px}
+  .empty-state p{font-size:13.5px;color:var(--ink-3);max-width:44ch;margin:0 auto;line-height:1.6}
+  .empty-state .es-arrow{font-family:var(--mono);font-size:11px;color:var(--signal);margin-top:14px;letter-spacing:.05em}
+
+  /* ============ NOTES ============ */
+  .notes{margin-top:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:16px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 20px;box-shadow:var(--shadow-sm);border-top:3px solid var(--signal)}
+  .card.gold{border-top-color:var(--gold)} .card.alert{border-top-color:var(--alert)}
+  .card h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--signal);margin-bottom:10px;font-weight:600;display:flex;align-items:center;gap:7px}
+  .card.gold h3{color:var(--gold)} .card.alert h3{color:var(--alert)}
+  .card p{font-size:12.5px;color:var(--ink-2);line-height:1.6}
+  .card p + p{margin-top:9px}
+  .card b{color:var(--ink);font-weight:600}
+  .tier-row{display:flex;gap:6px;align-items:center;margin:4px 0;font-size:12px}
+  .tier-badge{font-family:var(--mono);font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;flex:none;letter-spacing:.03em}
+  .tb-1{background:var(--gold-bg);color:#8a6410;border:1px solid #e6d5a6}
+  .tb-2{background:var(--hi);color:var(--signal);border:1px solid #bfe0d0}
+  .tb-3{background:#f6ece9;color:var(--alert);border:1px solid #e6c9c0}
+
+  /* ============ FOOTER ============ */
+  footer{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);font-family:var(--mono);font-size:10.5px;color:var(--ink-3);letter-spacing:.01em;line-height:1.85}
+  footer a{color:var(--signal);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+  footer .fbrand{color:var(--ink);font-weight:600}
+
+  tr.rowlink:focus-visible{outline:2px solid var(--signal);outline-offset:-2px}
+
+  @media (prefers-reduced-motion: reduce){
+    .radar .sweep,.pip-halo,.live-dot,.process-btn.is-running::after,.spinner,.mini-spin{animation:none}
+    .gauge .fill{transition:none}
+  }
+  @media (max-width:760px){
+    .masthead{flex-wrap:wrap;gap:16px}
+    .partner{align-items:flex-start}
+    .meta-cell{border-right:none;border-bottom:1px solid var(--line)}
+    .meta-cell:last-child{border-bottom:none}
+    .command-bar{flex-direction:column;align-items:stretch}
+    .process-btn{justify-content:center;width:100%}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== MASTHEAD ===== -->
+  <div class="masthead">
+    <div class="brand">
+      <svg class="radar" viewBox="0 0 64 64" aria-label="EventIQ logo">
+        <circle class="ring r3" cx="32" cy="32" r="29"/>
+        <circle class="ring r2" cx="32" cy="32" r="21"/>
+        <circle class="ring"    cx="32" cy="32" r="13"/>
+        <line class="cross" x1="32" y1="3" x2="32" y2="61"/>
+        <line class="cross" x1="3" y1="32" x2="61" y2="32"/>
+        <g class="sweep">
+          <path d="M32 32 L32 3 A29 29 0 0 1 55.1 17.8 Z" fill="url(#sweepgrad)"/>
+          <line x1="32" y1="32" x2="32" y2="3" stroke="var(--signal-bright)" stroke-width="1.5"/>
+        </g>
+        <circle class="pip" cx="44" cy="24" r="3"/>
+        <circle class="pip-halo" cx="44" cy="24" r="3" stroke-width="1.5"/>
+        <defs>
+          <linearGradient id="sweepgrad" x1="32" y1="32" x2="46" y2="8" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#20c489" stop-opacity="0.32"/>
+            <stop offset="1" stop-color="#20c489" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="lockup">
+        <div class="wordmark">Event<span class="iq">IQ</span></div>
+        <div class="tagline">Demand&nbsp;Signal&nbsp;Engine</div>
+      </div>
+    </div>
+
+    <div class="partner">
+      <span class="partner-lbl">Prepared&nbsp;for</span>
+      <a class="tm-logo" href="https://www.techment.com" target="_blank" rel="noopener" aria-label="Techment Technology">
+        <img class="tm-mark" src="data:image/jpeg;base64,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CiiigAooooAKKKKACiiigAooooAKZLKkMTyyNtRFLMfQCn1zPi/UPJtUso2+eb5n9lH+J/lQRUmqcXJ9DlNQvHv7+a5fPztkD0HYflVaiioPnpScm5PqFFFFAgooooAKKKKACiiigD0Pw3qH2/SkDtmWH5H9/Q/l/KtevPPDmo/YNVTccRTfI/t6H8/616HVI9vCVfaU7PdBRRRTOoKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAbJIsUbyOdqICzE9gK8y1K9fUNQluWz8x+Uei9hXWeLtR+z2S2cbfvJ+W9kH+J/ka4ikzy8fVu1TXzCiiipPOCiiigAooooAKKKKACiiigAr0Xw9qP9o6WhdszRfJJ746H8R/WvOq2fDWo/YdUVXOIp/kb2PY/n/OmjpwtX2dTXZnoNFFFUe4FFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUjusaM7kBVGST2FLXPeLdQ+zaeLVGxJP19kHX8+n50ETmoRcn0OS1W+Oo6jNcnO1jhAeyjpVOiioPn5yc5OT6hRRRQSFFFFABRRRQAUUUUAFFFFABRRRQB6PoOof2jpUbs2ZU+ST6jv+IrTrgPDGofYtUETnEVxhD7Hsf6fjXf1SPcwtX2lNX3QUUUUzpCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigBGYKpZjgAZJPavNNXvzqWpS3HOwnagPZR0/x/Gut8V6j9k077MjYluOD7L3/w/OuEpM8zH1dqa+YUUUVJ5oUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAAkHI4Nek6HqA1LTI5Scyr8kn+8O/49a82rd8Laj9j1LyHbEVxhfo3b/D8aaOrCVfZ1LPZne0UUVR7YUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABR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R/pSPNp05VHaKMTS9Fu9Vf8AdLshBw0rdB9PU13WmaPa6XHiFMyEfNI33j/gKuoiRIqRqqoowFUYAp1NI9ehhI09XqwooopnWFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQA2SJJo2jkRXRhgqwyDXIax4UaPdPpwLp1MJ6j6ev0rsaKDKrQhVVpHkxBUkEEEcEHtSV6Jq2gWuqAv/qrjtIo6/Ud64a/02602fyrmPH91hyrfQ1Njx6+GnSeuq7kEEz288c0Zw6MGU+4r06yukvrKG5j+7Iuceh7j868trqvB+o7ZJNPkPDfPH9e4/r+BoRpgqvJPlezOwoooqj2QooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoorP1m//s7TZJV/1rfJGPVj0/x/CgTaSuzkfFGo/bdTMKNmK3yo927n+n4VR03SbrVJdkCfIPvSN91a2dI8KyTkT6juSM8iLPzN9fT+f0rsIYY7eJYoUVI1GAqjAFK1zy44eeIm6k9EzP0rQ7XS0BQeZPjmVhz+HpWnRRTPShTjBWirBRRRQWFFFFABRRRQAUUUUAFFFFABRQSACScAVDbXdveRebazxzRgld0bBhkdsigCaiiigAooooAKKKKACiiigAooooAKiubaG7gaG4jWSNuoNS0UCaTVmcNrHheaz3T2e6aDqV/iX/EVh21xJa3Mc8Rw8bBhXqtYOseGYL/dNb4huOp/uv8AX/Gk0edXwVvepfcbFpcx3lpFcxfckXI9vapq5jwzLPYzzaTeIY3H7yPPf1x6+v5109M7aNT2kE3v19QooooNQooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACo3giklSV0DPHnYT/AA59KkooE0nuFFFFAwooooAKKKKACiiigAooooAKKKKACqGrazYaLam4vpxGv8K9Wc+gHeuc8S+PrTS99rp+26vBwWz+7jPue59h+deW3+o3eqXTXN7O80rd2PQegHYe1ddDCSqavRGFWvGGi1ZveJPG19rpe3hzbWJ48pT8zj/aP9On1rH0jW7/AEO6FxYzFCfvIeVcehHes+ivVhRhGPIlocMqkpPmbPaPDfjSw15VhkItr3/nkx4f/dPf6da6avnIEqQQSCOQR2ru/DXxDntNlrrBaeDotwOXT/e/vD9frXn18E171P7jqpYm+kz1KiobW6gvbdLi2mSWFxlXQ5BqavP2OsKKKKACiiigAooooAKKKKACiiigCOSCKVkZ0DNGdyHup9qkoooCwUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRXKeJfHNlom+2ttt1fDjYD8kZ/2j/QfpVRhKbtFailJRV2dBqOp2ek2rXN7OsMQ6E9WPoB3NeV+JfHl5rG+2st1rZHg4PzyD/aI6D2H61zuqate6xdm5vp2lfoo6BR6AdhVKvUoYKMfenqzhq4hy0jsFFFFdxzBRRRQAUUUUAauieIdQ0C582zl+Qn54W5R/qPX3616z4d8Xaf4gjCIwgvAPmt3PP1U9xXiNOR2jdXRirqcqynBB9RXPXw0Kuuz7m1OtKGnQ+jKK808NfEVo9lprZLJ0W6Ucj/eHf6ivR4Z4rmFJoJFkicZV0OQR7GvIq0Z0naSO+FSM1dElFFFZFhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFV72+tdOtWubydIYV6s5/T3PtWF4j8Z6foKtCpFxe44hQ8Kf9o9vp1ryfWNcv8AXbrz72Ytj7kY4VB6AV00MLOrrsjGpWjDTqdL4l+IN1qO+10vfbWvQy5xI4/9lH6/yriaKK9elRhSVoo4J1JTd2FFFFaEBRRRQAUUUUAFFFFABRRRQAVtaB4n1Dw/ODbyb7cnL27n5W+nofcfrWLRSlFSXLJaDjJxd0e6aB4o0/xBDm3fy7gDL27n5l+nqPf+VbVfOkM0tvMk0MjRyocq6HBB+tekeGviKsmy01shW6LdKOD/ALw7fUV5dfBOPvU9UdtLEJ6SPQ6KajpLGskbK6MMqynII9QadXAdQUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRWD4h8W6f4fjKyN512RlbdDz+J/hFOMXJ2Qm0ldmzc3MFnbvcXMqRRIMs7nAFeZ+JfiJLdb7XRi0MPRrg8O3+6P4R79fpXMa54i1DX7jzLuXEan5IU4RPw7n3NZNenQwSXvVPuOOriW9ICsxZizElickk8k0lFFegcgUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHQeHfF2oeH5AiN59mT81u54+qnsa9Z0TxDp+v23m2cvzqPnhbh0+o9PevBqmtrqeyuEuLaZ4pkOVdDgiuWvhI1NVozelXlDR6o+iKK4Pw18RIbvZa6wUgm6LcDhH/3v7p/T6V3YIYAggg8gjvXk1KUqbtJHfCcZq6FooorMoKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApksscETSzSLHGgyzucAD3NZOveJtO8PwbrmTfORlIEOXb/Ae5ryXxB4p1DxDN+/fy7YHKW6H5R7n1Pv/Kuijh51Xpt3MqlaMN9zqvEvxFLb7TRCVHRrphyf90H+Z/8Ar155JI80jSSOzuxyzMckn1JptFevSoQpK0TgqVJTeoUUUVqZhRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAV03hvxpf6CywOTc2OeYWPK/wC6e306VzNFTOEZq0lcqMnF3R79pGt2GuWv2ixmDgfeQ8Mh9CK0K+ebG/utNulubOd4Zl6Mp/Q+o9q9R8NfEC11LZa6nstbs8B84jkP/sp+v/1q8qvg5U/ejqjupYhS0loztaKKK4joCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKy9a8QafoNt5t5LhyPkiXl3+g/r0ppNuyBu25pO6xozuwVVGSzHAArz/wAS/EVIt9pohDv0a6YZUf7o7/U8fWuU8ReL9Q8QOY2YwWeflgQ8H3Y9z+lc9XpUMF9qp9xx1cT0gSTzzXU7zzyPLK5yzuckn61HRRXopJKyONu4UUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHW+GvHV7o2y2u911YjgKT88Y/2T6ex/SvVdM1Wy1i0FzYzrLGeDjqp9COxr59q5puqXukXa3NjO0Ug646MPQjuK46+DjU96OjOiliHHR6o+gqK5Lw147stZ2W15ttb08AE/JIf9k9j7H9a62vKnCUHyyVjujJSV0FFFFQUFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUEgAknAFUNW1mx0S0NxfThF/hUcs59AO9eT+JPGt/rpaCIm2sTx5Snl/949/p0+tbUaE6r93YzqVYwWp1viX4hwWW+10gpcXHQznlE+n94/p9a8xu7u4vrl7m6meaZzlnc5JqGivXo4eFJab9zgqVZT32CiiitzIKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACu08NeP7vTNlrqW+6tBwHzmSMfXuPY1xdFRUpxqK0kVCcoO6PoWx1C01O1W5sp0mhboynp7Edj7GrNeA6TrV/ol159jOUJ+8h5Vx6Ed69Y8N+NbDXgsEmLa9/wCeTHh/909/p1rya+ElT1WqO+lXjPR6M6aiiiuQ3CiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKr317b6dZS3l1JshiXczYzQBYrjPEvj+00vda6bsurscFs5jjPue59hXJeJfHd5rG+2s91rZHggH55B/tHsPYfrXI16NDBN+9U+45KuJtpAs3+oXep3bXV5O80zdWY9B6Adh7VWoor0klFWRxttu7CiiimIKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAopVVnYKilmJwABkk1Pd2N3YSLHd200DsMgSoVJH40AV6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKUEggg4I6EUlFAHd+GviHPZ7LTWN09v0E45dPr/eH6/WvTbW7t762S4tZkmhcZV0OQa+d61NE8Q6hoNx5tnNhCcvC3KP9R/Uc1w18FGXvQ0Z00sQ46S2PeqKwvDfii08SW7mJWiuIgPNhbnGe4PcVu15couL5ZbncmpK6CiiipGFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFebfE3WiXg0aFuBiWfHr/CP6/iK9Bv72LTtPnvJziOFC7e+O1eBahezalqE95O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" alt="Techment logo">
+        <span class="tm-word">Tech<b>ment</b></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== TITLE ===== -->
+  <div class="titleblock">
+    <span class="status"><span class="live-dot"></span>Signal Report · Prioritized for the Microsoft Data &amp; AI Estate</span>
+    <h1>Where Techment leadership should <em>show up</em>.</h1>
+    <p class="sub">An autonomous shortlist of U.S. technology, Data&nbsp;&amp;&nbsp;AI, and vertical-tech events (Jul&nbsp;2026&nbsp;onward), ranked against Techment's service lines — Microsoft-ecosystem Data Engineering, AI/Azure OpenAI, and App Modernization — across Healthcare, Retail, Energy&nbsp;&amp;&nbsp;Utilities, Insurance, and Financial Services. The top signal is <b>attendee-list accessibility</b>: can we get a warm meeting before we book the flight?</p>
+
+    <!-- ===== COMMAND BAR: PROCESS BUTTON ===== -->
+    <div class="command-bar">
+      <div class="cmd-left">
+        <div class="cmd-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#20c489" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="9" opacity=".4"/>
+            <path d="M12 3v4M12 17v4M3 12h4M17 12h4"/>
+            <circle cx="12" cy="12" r="3.2" fill="#20c489" stroke="none"/>
+          </svg>
+        </div>
+        <div class="cmd-copy">
+          <div class="cmd-title">Run the EventIQ pipeline</div>
+          <div class="cmd-desc" id="cmd-desc">7 agents · Discover ▸ Extract ▸ Attendee access ▸ Score ▸ Rank ▸ Dedupe ▸ Search</div>
+        </div>
+      </div>
+      <button class="process-btn" id="processBtn" aria-label="Process — run the complete EventIQ pipeline">
+        <span class="pb-ic" id="pbIc">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="6 4 20 12 6 20 6 4" fill="currentColor" stroke="none"/>
+          </svg>
+        </span>
+        <span id="pbLabel">Process</span>
+      </button>
+    </div>
+
+    <!-- ===== PIPELINE PROGRESS PANEL ===== -->
+    <div class="pipeline" id="pipeline">
+      <div class="pl-head">
+        <div class="pl-h-left">
+          <span class="pl-title">Pipeline execution</span>
+          <span class="pl-mode" id="plMode">Offline · deterministic fixtures</span>
+        </div>
+        <span class="pl-elapsed">Elapsed <b id="plElapsed">0.0s</b></span>
+      </div>
+      <div class="pl-progress">
+        <div class="pl-bar"><i id="plBarFill"></i></div>
+        <div class="pl-pct"><span id="plStage">Idle</span><span><b id="plPct">0</b>% complete</span></div>
+      </div>
+      <div class="pl-steps" id="plSteps"><!-- injected --></div>
+      <div class="pl-foot" id="plFoot">
+        <span class="chk">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </span>
+        <span><b id="plFootN">14</b> events shortlisted, scored &amp; ranked — <b id="plFootStar">13</b> with attendee-list access.</span>
+        <a class="jump" id="plJump">View ranked table ↓</a>
+      </div>
+    </div>
+
+    <!-- ===== META STRIP ===== -->
+    <div class="meta-strip">
+      <div class="meta-cell"><div class="k">Scope</div><div class="v"><span class="sig">USA</span> · H2 2026+</div></div>
+      <div class="meta-cell"><div class="k">Priority stack</div><div class="v">MS ▸ Data&amp;AI ▸ Industry</div></div>
+      <div class="meta-cell"><div class="k">Events scored</div><div class="v"><span id="mEvents">—</span></div></div>
+      <div class="meta-cell"><div class="k">List access</div><div class="v"><span class="sig">★</span> <span id="mStar">—</span></div></div>
+      <div class="meta-cell"><div class="k">Reference</div><div class="v">techment.com</div></div>
+      <div class="meta-cell"><div class="k">Generated</div><div class="v">03 Jul 2026</div></div>
+    </div>
+  </div>
+
+  <!-- ===== TOOLBAR ===== -->
+  <div class="toolbar">
+    <div class="filters" id="filters">
+      <button class="fbtn active" data-f="all"><span class="swatch sw-all"></span>All <span class="ct" id="ct-all"></span></button>
+      <button class="fbtn" data-f="ms"><span class="swatch sw-ms"></span>Microsoft <span class="ct" id="ct-ms"></span></button>
+      <button class="fbtn" data-f="data"><span class="swatch sw-data"></span>Data &amp; AI <span class="ct" id="ct-data"></span></button>
+      <button class="fbtn" data-f="ind"><span class="swatch sw-ind"></span>Industry <span class="ct" id="ct-ind"></span></button>
+    </div>
+    <div class="hint">Click any row → official event site&nbsp;·&nbsp;<span class="k">↑↓</span> ranked by fit</div>
+  </div>
+
+  <!-- ===== TABLE ===== -->
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th class="center">S.No</th>
+          <th class="center"><span class="th-rank">Rank</span></th>
+          <th>Event</th>
+          <th>Focus area</th>
+          <th>Month / date</th>
+          <th>Geo / location</th>
+          <th>Pricing <span style="opacity:.55">tent.</span></th>
+          <th class="center">Attendees</th>
+          <th>Ideal prospects</th>
+          <th>Competitor density</th>
+          <th>Website</th>
+          <th class="center">Fit score</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody id="rows">
+        <tr id="emptyRow"><td colspan="13">
+          <div class="empty-state">
+            <svg class="es-mark" viewBox="0 0 64 64" fill="none" stroke="var(--signal)" stroke-width="1.5">
+              <circle cx="32" cy="32" r="28" opacity=".3"/><circle cx="32" cy="32" r="18" opacity=".5"/><circle cx="32" cy="32" r="8"/>
+              <circle cx="44" cy="24" r="2.5" fill="var(--gold)" stroke="none"/>
+            </svg>
+            <h3>The signal grid is idle</h3>
+            <p>Hit <b>Process</b> above to run all seven agents. EventIQ will discover events across the source list, verify attendee-list access, score each against Techment's service offerings, and rank the shortlist here.</p>
+            <div class="es-arrow">↑ Press Process to begin</div>
+          </div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ===== NOTES ===== -->
+  <div class="notes">
+    <div class="card gold">
+      <h3><span class="star" style="color:var(--gold)">★</span> Attendee-list access — 3 tiers</h3>
+      <div class="tier-row"><span class="tier-badge tb-1">★ TIER 1</span> <span><b>Official list</b> — organizer matchmaking app exposes attendees &amp; books 1:1s.</span></div>
+      <div class="tier-row"><span class="tier-badge tb-2">◐ TIER 2</span> <span><b>Third-party predictive</b> — Vendelux / Lensmor enriched rosters.</span></div>
+      <div class="tier-row"><span class="tier-badge tb-3">✕ TIER 3</span> <span><b>Not available</b> — no structured access; not starred.</span></div>
+      <p style="margin-top:10px">Tier 2 carries a compliance caveat: rosters are <b>predicted, not opt-in</b>. Vet before outreach.</p>
+    </div>
+    <div class="card">
+      <h3>How the fit score works</h3>
+      <p>Weighted for Techment: <b>attendee-list accessibility</b> (primary) ▸ Microsoft-ecosystem alignment ▸ decision-maker seniority ▸ vertical match (Health / Retail / Energy / Insurance / FinServ) ▸ prospect-vs-competitor density.</p>
+      <p>Microsoft-native events rank highest. Competitor-cloud events (AWS, multi-cloud) are included for reach but scored lower — the Microsoft-partner message differentiates less there.</p>
+    </div>
+    <div class="card alert">
+      <h3>Read the competitor column</h3>
+      <p>A heavy <b>AWS / Databricks / multi-cloud</b> presence signals a competing ecosystem. Great for raw prospect volume, weaker for Techment's Microsoft-partner differentiation.</p>
+      <p>Play these for <b>reach and account-mapping</b>, not core positioning — and set booth / attendee strategy accordingly.</p>
+    </div>
+  </div>
+
+  <footer>
+    SOURCES · Google · 10Times · Eventbrite · LinkedIn Events &amp; Posts · Microsoft Events (Ignite, AI Tour, FabCon) · AWS · Google Cloud · Gartner · Meetup · association &amp; industry portals · attendee data cross-referenced via organizer matchmaking apps + Vendelux / Lensmor predictive rosters. Microsoft event pages prioritized over others.<br>
+    Dates &amp; pricing are indicative and shift — confirm on each official site before committing. Microsoft AI Tour 2026–27 U.S. city dates were unannounced at generation time (series confirmed, 30+ cities, from fall 2026). FabCon 2027 &amp; Gartner D&amp;A 2027 dates are projected from prior-year cadence.<br>
+    Prepared by <span class="fbrand">EventIQ</span> for <span class="fbrand">Techment Technology</span> · scored against <a href="https://www.techment.com" target="_blank" rel="noopener">techment.com</a> service offerings.
+  </footer>
+
+</div>
+
+<script>
+/* ============================================================
+   EVENTIQ — verified event dataset (scored for Techment)
+   ============================================================ */
+const EVENTS = [
+  { sno:1, rank:1, name:"Microsoft Ignite 2026", sub:"Microsoft's flagship — Fabric, Copilot, Azure AI",
+    focus:"ms", focusLabel:"Microsoft · Data & AI",
+    mo:"November", dt:"17–20, 2026", geo:"San Francisco, CA", loc:"Moscone Center · West",
+    price:"~$1,525", free:false, att:"20,000+", attNote:"in-person",
+    prospects:"Enterprise IT/Data leaders, CIOs, CDOs, Azure & Fabric adopters",
+    comp:"Every MS SI (Accenture, EY, Avanade)", warn:false,
+    score:96, access:"part", accessNote:"Vendelux predictive",
+    remark:"<span class='lead'>Top priority.</span> The single highest-density room of Techment's exact buyer — Microsoft data-estate owners. Sponsor + pre-book meetings in the event app.",
+    url:"https://ignite.microsoft.com/" },
+
+  { sno:2, rank:2, name:"Microsoft AI Tour 2026–27", sub:"Free 1-day city series · 30+ US cities",
+    focus:"ms", focusLabel:"Microsoft · AI",
+    mo:"Fall 2026→", dt:"Dates TBA", geo:"Multi-city, US", loc:"NYC · Chicago · Atlanta +more",
+    price:"Free", free:true, att:"1.5–2.5K", attNote:"per city",
+    prospects:"Regional IT decision-makers, Copilot & Azure evaluators",
+    comp:"Local MS partners per market", warn:false,
+    score:92, access:"part", accessNote:"Vendelux per city",
+    remark:"<span class='lead'>Best ROI-to-cost.</span> Free, Microsoft-native, decision-maker audience, repeats across cities — hit multiple regions cheaply. Watch aitour.microsoft.com.",
+    url:"https://aitour.microsoft.com/" },
+
+  { sno:3, rank:3, name:"FabCon — Fabric Community Conf 2027", sub:"Largest Fabric-dedicated event (US)",
+    focus:"ms", focusLabel:"Microsoft · Fabric",
+    mo:"Spring 2027", dt:"Mar/Apr · TBA", geo:"US venue TBA", loc:"2026 was Atlanta, GA",
+    price:"~$1,500–2,100", free:false, att:"7–10K+", attNote:"projected",
+    prospects:"Fabric / Power BI / OneLake adopters — Techment's exact tech buyer",
+    comp:"YASH, DynaTech, PwC & Fabric partners", warn:false,
+    score:90, access:"part", accessNote:"predictive near date",
+    remark:"<span class='lead'>Most on-message event Techment can attend</span> — 100% Fabric, the core of its Microsoft partnership. US 2026 edition (Mar, Atlanta) has passed; watch fabriccon.com for 2027.",
+    url:"https://fabriccon.com/" },
+
+  { sno:4, rank:4, name:"Gartner IT Symposium/Xpo 2026", sub:"World's top CIO gathering",
+    focus:"data", focusLabel:"Data & AI · Exec",
+    mo:"October", dt:"19–22, 2026", geo:"Orlando, FL", loc:"Walt Disney Swan & Dolphin",
+    price:"~$4,500–5,000", free:false, att:"9–10K+", attNote:"CIO-level",
+    prospects:"CIOs, CTOs, VP-IT with direct budget authority",
+    comp:"MS, SAP, Oracle, AWS, IBM, ServiceNow", warn:false,
+    score:88, access:"part", accessNote:"Vendelux (6.7K confirmed)",
+    remark:"Highest <b>seniority-per-attendee</b> on the list — nearly every badge holds tech budget. Vendor-neutral, so lead with outcomes not stack. Premium cost.",
+    url:"https://www.gartner.com/en/conferences/na/symposium-us" },
+
+  { sno:5, rank:5, name:"Ai4 2026", sub:"America's largest applied-AI conference",
+    focus:"data", focusLabel:"Data & AI · Applied",
+    mo:"August", dt:"4–6, 2026", geo:"Las Vegas, NV", loc:"The Venetian",
+    price:"~$1,695–3,195", free:false, att:"12,000+", attNote:"projected",
+    prospects:"Enterprise AI leads across FinServ, Health, Retail, Energy, Insurance",
+    comp:"Google, AWS, Databricks, NVIDIA, SIs", warn:false,
+    score:86, access:"part", accessNote:"private app + Vendelux",
+    remark:"<span class='lead'>Soonest major event</span> (~4 weeks out) & cross-vertical — every Techment industry has a track. Strong for pipeline breadth; competitor-dense floor.",
+    url:"https://ai4.io/" },
+
+  { sno:6, rank:6, name:"AI Agent & Copilot Summit NA 2027", sub:"Microsoft-stack agent builders",
+    focus:"ms", focusLabel:"Microsoft · Copilot/Agents",
+    mo:"Spring 2027", dt:"Mar 30 – Apr 1", geo:"San Diego, CA", loc:"Gaylord Pacific",
+    price:"~$1,800–2,500", free:false, att:"3,000+", attNote:"est.",
+    prospects:"Copilot Studio, Azure AI Foundry, Power Platform adopters",
+    comp:"Microsoft agent-build partners", warn:false,
+    score:85, access:"part", accessNote:"predictive near date",
+    remark:"Squarely Techment's <b>RAG / AI-agents</b> offering on the Microsoft stack. Next US edition spring 2027 — put on the radar now.",
+    url:"https://www.aiagentandcopilotsummit.com/" },
+
+  { sno:7, rank:7, name:"InsureTech Connect (ITC Vegas) 2026", sub:"World's largest insurance-innovation event",
+    focus:"ind", focusLabel:"Industry · Insurance Tech",
+    mo:"Sep–Oct", dt:"Sep 29 – Oct 1", geo:"Las Vegas, NV", loc:"Mandalay Bay",
+    price:"~$2,000–2,600", free:false, att:"9,000+", attNote:"confirmed",
+    prospects:"Insurance carriers, InsurTech CDOs/CIOs — data-modernization buyers",
+    comp:"Insurance SIs, Guidewire/Duck Creek", warn:false,
+    score:84, access:"yes", accessNote:"official matchmaking",
+    remark:"<span class='lead'>Vertical bullseye.</span> Ties to Techment's insurance & workers-comp case studies. Official 1:1 matchmaking = warm meetings.",
+    url:"https://vegas.insuretechconnect.com/" },
+
+  { sno:8, rank:8, name:"HLTH USA 2026", sub:"Healthcare's #1 innovation event",
+    focus:"ind", focusLabel:"Industry · Health Tech",
+    mo:"November", dt:"15–18, 2026", geo:"Las Vegas, NV", loc:"The Venetian Expo",
+    price:"~$2,500–4,000", free:false, att:"12,250+", attNote:"confirmed",
+    prospects:"Payers, providers, health-system CIOs / CDOs / CMIOs",
+    comp:"Health-IT SIs; MS & Google Cloud present", warn:false,
+    score:82, access:"yes", accessNote:"8,500+ pre-booked 1:1s",
+    remark:"<span class='lead'>Vertical bullseye.</span> Maps to Techment's healthcare AI & Fabric work. 8,500+ pre-booked meetings + AI networking app make targeted outreach easy.",
+    url:"https://hlth.com/events/usa/" },
+
+  { sno:9, rank:9, name:"Gartner Data & Analytics Summit 2027", sub:"CDAO-focused strategy summit",
+    focus:"data", focusLabel:"Data & AI · CDAO",
+    mo:"Spring 2027", dt:"March · TBA", geo:"Orlando, FL", loc:"Gaylord Palms",
+    price:"~$3,500–4,500", free:false, att:"4,000+", attNote:"CDAO-level",
+    prospects:"CDAOs, heads of AI, data-governance leaders",
+    comp:"Data-platform & governance vendors", warn:false,
+    score:80, access:"part", accessNote:"predictive near date",
+    remark:"Purest <b>CDAO / data-leader</b> room — ideal for Techment's data-engineering & governance pitch. 2026 edition (Mar) passed; track 2027 dates.",
+    url:"https://www.gartner.com/en/conferences/na/data-analytics-us" },
+
+  { sno:10, rank:10, name:"DISTRIBUTECH International 2027", sub:"North America's top utility T&D event",
+    focus:"ind", focusLabel:"Industry · Energy/Utilities Tech",
+    mo:"March 2027", dt:"1–4, 2027", geo:"Atlanta, GA", loc:"Georgia World Congress Ctr",
+    price:"~$1,800–2,400", free:false, att:"17,000+", attNote:"utility-heavy",
+    prospects:"Utility IT/OT leaders, grid-data & AI-forecasting buyers",
+    comp:"Utility-focused SIs, grid-analytics vendors", warn:false,
+    score:79, access:"part", accessNote:"predictive near date",
+    remark:"<span class='lead'>Energy & Utilities vertical fit.</span> Sessions on cognitive/agentic AI & predictive grid analytics map to Techment's data-engineering work. Huge, utility-dense audience.",
+    url:"https://www.distributech.com/" },
+
+  { sno:11, rank:11, name:"Groceryshop 2026", sub:"Grocery & CPG retail future",
+    focus:"ind", focusLabel:"Industry · Retail Tech",
+    mo:"September", dt:"22–24, 2026", geo:"Las Vegas, NV", loc:"Mandalay Bay",
+    price:"~$1,900–3,500", free:false, att:"4,000+", attNote:"est.",
+    prospects:"Grocery / CPG merchandising, e-comm & data leaders",
+    comp:"Retail-analytics vendors, cloud retail teams", warn:false,
+    score:78, access:"yes", accessNote:"pre-matched 1:1s",
+    remark:"Aligns with Techment's retail-analytics & decision-intelligence pitch. Sessions on agentic copilots for commercial teams. High-volume matchmaking.",
+    url:"https://groceryshop.com/" },
+
+  { sno:12, rank:12, name:"Shoptalk Fall 2026", sub:"Retail ecosystem, curated networking",
+    focus:"ind", focusLabel:"Industry · Retail Tech",
+    mo:"Sep–Oct", dt:"Sep 29 – Oct 1", geo:"Nashville, TN", loc:"Music City Center",
+    price:"~$1,900", free:false, att:"3,000+", attNote:"est.",
+    prospects:"Retail CIOs, digital & data leaders",
+    comp:"Retail cloud & analytics vendors", warn:false,
+    score:76, access:"yes", accessNote:"Meetup 1:1 program",
+    remark:"Retail fit with best-in-class curated <b>Meetup</b> matchmaking. Overlaps ITC dates — pick one Vegas / Nashville swing.",
+    url:"https://shoptalk.com/" },
+
+  { sno:13, rank:13, name:"The AI Conference 2026", sub:"Vendor-neutral, technical",
+    focus:"data", focusLabel:"Data & AI · Technical",
+    mo:"Sep–Oct", dt:"Sep 29 – Oct 1", geo:"San Francisco, CA", loc:"Pier 48",
+    price:"~$1,295+", free:false, att:"5,500+", attNote:"est.",
+    prospects:"AI builders, ML leads, technical decision-makers",
+    comp:"Open-source & multi-cloud AI vendors", warn:false,
+    score:70, access:"no", accessNote:"",
+    remark:"Good for <b>technical credibility & partner scouting</b>, less for exec pipeline. No structured attendee access — lower priority than the vertical events.",
+    url:"https://aiconference.com/" },
+
+  { sno:14, rank:14, name:"AWS re:Invent 2026", sub:"Largest cloud & AI gathering",
+    focus:"data", focusLabel:"Data & AI · Cloud",
+    mo:"Nov–Dec", dt:"Nov 30 – Dec 4", geo:"Las Vegas, NV", loc:"Multiple venues",
+    price:"~$2,099", free:false, att:"60,000+", attNote:"mixed-cloud",
+    prospects:"Massive enterprise data/AI audience (mixed-cloud reality)",
+    comp:"AWS-native — competing ecosystem to Azure", warn:true,
+    score:62, access:"part", accessNote:"Vendelux predictive",
+    remark:"<span class='lead'>Volume play only.</span> Huge audience, but AWS-centric — Techment's Microsoft-partner story differentiates less. Attend for reach, not core message.",
+    url:"https://reinvent.awsevents.com/" }
+];
+
+const CIRC = 2 * Math.PI * 32;
+
+/* ---- helpers ---- */
+function tierOf(s){ return s>=85 ? 'hi' : s>=75 ? 'mid' : 'lo'; }
+function tierLabel(s){ return s>=85 ? 'Priority' : s>=75 ? 'Strong fit' : 'Reach'; }
+function accessBadge(a, note){
+  if(a==='yes')  return `<span class="access a-yes"><span class="star">★</span>List available</span>`;
+  if(a==='part') return `<span class="access a-part">◐ ${note||'Predictive'}</span>`;
+  return `<span class="access a-no">✕ No list</span>`;
+}
+const CHECK_SVG = `<svg class="check" viewBox="0 0 24 24" fill="none" stroke="var(--signal)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+/* ---- render one table row ---- */
+function rowHTML(e){
+  const t = tierOf(e.score);
+  const offset = CIRC * (1 - e.score/100);
+  const medal = e.rank<=3 ? `<span class="medal">◆</span>` : '';
+  return `
+    <td class="sno">${String(e.sno).padStart(2,'0')}</td>
+    <td class="rk">${medal}${String(e.rank).padStart(2,'0')}</td>
+    <td class="evcell">
+      <span class="evname">${e.name}<span class="arw">↗</span></span>
+      <div class="evsub">${e.sub}</div>
+      ${accessBadge(e.access, e.accessNote)}
+    </td>
+    <td><span class="focus"><span class="fdot ${e.focus}"></span>${e.focusLabel.split(' · ')[0]}</span><span class="fsub">${e.focusLabel.split(' · ')[1]||''}</span></td>
+    <td><div class="when"><span class="mo">${e.mo}</span><span class="dt">${e.dt}</span></div></td>
+    <td><div class="geo">${e.geo}</div><div class="loc">${e.loc}</div></td>
+    <td><div class="price ${e.free?'free':''}">${e.free?'Free':e.price}</div></td>
+    <td><div class="att">${e.att}<small>${e.attNote}</small></div></td>
+    <td><div class="people">${e.prospects}</div></td>
+    <td><div class="comp">${e.warn?'<span class="warn">⚠ </span>':''}${e.comp}</div></td>
+    <td class="webcell"><a class="weblink" href="${e.url}" target="_blank" rel="noopener" onclick="event.stopPropagation()">
+      <svg class="lk" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      Visit ↗</a></td>
+    <td class="score-cell">
+      <div class="gauge">
+        <svg width="74" height="74" viewBox="0 0 74 74">
+          <circle class="track" cx="37" cy="37" r="32"/>
+          <circle class="fill ${t}" cx="37" cy="37" r="32"
+            stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="${CIRC.toFixed(1)}" data-off="${offset.toFixed(1)}"/>
+        </svg>
+        <div class="num"><b>${e.score}</b><i>/100</i></div>
+      </div>
+      <div class="tier ${t}">${tierLabel(e.score)}</div>
+    </td>
+    <td><div class="remark">${e.remark}</div></td>
+  `;
+}
+
+/* ============================================================
+   PIPELINE — 7 coordinated agents with live progress feedback
+   ============================================================ */
+const AGENTS = [
+  { key:"discovery",  name:"Discovery",     label:"Discover events across source list",
+    logs:["Querying Google, 10Times, Eventbrite, LinkedIn…","Prioritizing Microsoft event pages…","Scanning AWS · Gartner · Meetup · industry portals…","Collating candidate events…"],
+    stat:(s)=>`<b>${s.found}</b> found` },
+  { key:"extraction", name:"Extraction",    label:"Extract dates, venue, pricing, audience",
+    logs:["Parsing event pages for structured fields…","Normalizing dates & venues…","Reading pricing tiers & expected attendance…"],
+    stat:(s)=>`<b>${s.found}</b> parsed` },
+  { key:"attendee",   name:"Attendee Access", label:"Verify attendee-list accessibility",
+    logs:["Checking organizer matchmaking apps (Tier 1)…","Cross-referencing Vendelux / Lensmor rosters (Tier 2)…","Flagging events with no structured access (Tier 3)…"],
+    stat:(s)=>`<b>${s.star}</b> ★ access` },
+  { key:"scoring",    name:"Scoring",       label:"Score fit vs. techment.com offerings",
+    logs:["Weighting attendee-list access (primary signal)…","Scoring Microsoft-ecosystem alignment…","Matching verticals: Health · Retail · Energy · Insurance…","Assessing prospect-vs-competitor density…"],
+    stat:(s)=>`avg <b>${s.avg}</b>` },
+  { key:"recommend",  name:"Recommendation", label:"Rank the shortlist",
+    logs:["Sorting by weighted fit score…","Assigning priority tiers…","Selecting top targets…"],
+    stat:(s)=>`<b>${s.found}</b> ranked` },
+  { key:"database",   name:"Persistence",   label:"Persist & dedupe records",
+    logs:["Writing to store with dedupe key…","Reconciling duplicates by name + date…","Committing shortlist…"],
+    stat:(s)=>`<b>${s.found}</b> saved` },
+  { key:"search",     name:"Search Index",  label:"Build natural-language search index",
+    logs:["Embedding event records…","Indexing for NL query…","Pipeline ready."],
+    stat:(s)=>`<b>${s.found}</b> indexed` }
+];
+
+const S = { found:0, star:0, avg:0 };
+const totalStar = EVENTS.filter(e=>e.access!=='no').length;
+const avgScore = Math.round(EVENTS.reduce((a,e)=>a+e.score,0)/EVENTS.length);
+
+let running = false, doneOnce = false;
+const btn = document.getElementById('processBtn');
+const pbLabel = document.getElementById('pbLabel');
+const pbIc = document.getElementById('pbIc');
+const pipeline = document.getElementById('pipeline');
+const plSteps = document.getElementById('plSteps');
+const plBarFill = document.getElementById('plBarFill');
+const plPct = document.getElementById('plPct');
+const plStage = document.getElementById('plStage');
+const plElapsed = document.getElementById('plElapsed');
+const plFoot = document.getElementById('plFoot');
+const plMode = document.getElementById('plMode');
+const tbody = document.getElementById('rows');
+
+const sleep = (ms)=>new Promise(r=>setTimeout(r, ms));
+
+/* Detect "live mode" the way the backend does: an API key present.
+   In this static app we default to offline/deterministic fixtures. */
+const LIVE = false;
+plMode.textContent = LIVE ? "Live · Claude agents" : "Offline · deterministic fixtures";
+
+/* build step scaffold */
+function buildSteps(){
+  plSteps.innerHTML = '';
+  AGENTS.forEach((a,i)=>{
+    const div = document.createElement('div');
+    div.className = 'step pending';
+    div.id = 'step-'+a.key;
+    div.innerHTML = `
+      <div class="step-ic">${i+1}</div>
+      <div class="step-body">
+        <div class="step-name">${a.label}<span class="step-agent">${a.name} agent</span></div>
+        <div class="step-log" id="log-${a.key}">Queued</div>
+      </div>
+      <div class="step-stat" id="stat-${a.key}"></div>`;
+    plSteps.appendChild(div);
+  });
+}
+
+function setProgress(pct, stageText){
+  plBarFill.style.width = pct + '%';
+  plPct.textContent = Math.round(pct);
+  if(stageText) plStage.textContent = stageText;
+}
+
+async function typeLog(key, text){
+  const el = document.getElementById('log-'+key);
+  el.innerHTML = '';
+  for(let i=0;i<text.length;i++){
+    el.textContent = text.slice(0,i+1);
+    el.innerHTML = el.textContent + '<span class="cursor"></span>';
+    await sleep(7);
+  }
+  el.textContent = text;
+}
+
+async function runPipeline(){
+  if(running) return;
+  running = true;
+  doneOnce = false;
+
+  // reset UI
+  S.found = 0; S.star = 0; S.avg = 0;
+  btn.disabled = true;
+  btn.classList.remove('is-done'); btn.classList.add('is-running');
+  pbLabel.textContent = 'Processing…';
+  pbIc.innerHTML = '<span class="spinner"></span>';
+  buildSteps();
+  plFoot.classList.remove('show');
+  pipeline.classList.add('open');
+  setProgress(0, 'Starting…');
+
+  // clear table to empty, we'll stream rows during ranking
+  const emptyRow = document.getElementById('emptyRow');
+  if(emptyRow) emptyRow.remove();
+  tbody.innerHTML = '';
+
+  const t0 = performance.now();
+  const timer = setInterval(()=>{ plElapsed.textContent = ((performance.now()-t0)/1000).toFixed(1)+'s'; }, 100);
+
+  const perAgent = 100 / AGENTS.length;
+
+  for(let ai=0; ai<AGENTS.length; ai++){
+    const a = AGENTS[ai];
+    const stepEl = document.getElementById('step-'+a.key);
+    const statEl = document.getElementById('stat-'+a.key);
+    stepEl.classList.remove('pending'); stepEl.classList.add('active');
+    statEl.innerHTML = '<span class="mini-spin"></span>';
+    plStage.textContent = a.name + ' agent running…';
+
+    // stream this agent's log lines
+    for(let li=0; li<a.logs.length; li++){
+      await typeLog(a.key, a.logs[li]);
+      // advance counters progressively so stats feel live
+      const frac = (li+1)/a.logs.length;
+      if(a.key==='discovery' || a.key==='extraction' || a.key==='recommend' || a.key==='database' || a.key==='search'){
+        S.found = Math.round(EVENTS.length * frac);
+      }
+      if(a.key==='attendee'){ S.star = Math.round(totalStar * frac); }
+      if(a.key==='scoring'){ S.avg = Math.round(avgScore * frac); }
+      statEl.innerHTML = a.stat(S);
+
+      // during Recommendation, stream ranked rows into the table
+      if(a.key==='recommend'){
+        const upto = Math.round(EVENTS.length * frac);
+        for(let r=tbody.children.length; r<upto; r++){
+          const e = EVENTS[r];
+          const tr = document.createElement('tr');
+          tr.className = 'rowlink reveal';
+          tr.dataset.focus = e.focus;
+          tr.setAttribute('role','link'); tr.setAttribute('tabindex','0');
+          tr.setAttribute('aria-label', `${e.name} — open official site`);
+          const open = ()=> window.open(e.url,'_blank','noopener');
+          tr.addEventListener('click', open);
+          tr.addEventListener('keydown', ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); open(); }});
+          tr.innerHTML = rowHTML(e);
+          tbody.appendChild(tr);
+        }
+      }
+      setProgress(ai*perAgent + perAgent*frac, a.name + ' agent running…');
+    }
+
+    // finalize stats for this agent
+    if(a.key==='discovery'||a.key==='extraction'||a.key==='recommend'||a.key==='database'||a.key==='search') S.found = EVENTS.length;
+    if(a.key==='attendee') S.star = totalStar;
+    if(a.key==='scoring') S.avg = avgScore;
+    statEl.innerHTML = a.stat(S) + ' ' + CHECK_SVG;
+
+    stepEl.classList.remove('active'); stepEl.classList.add('done');
+    setProgress((ai+1)*perAgent, a.name + ' complete');
+    await sleep(160);
+  }
+
+  clearInterval(timer);
+  setProgress(100, 'Pipeline complete');
+
+  // ensure every row is present & animate gauges
+  ensureAllRows();
+  animateGauges();
+  refreshCounts();
+  applyActiveFilter();
+
+  // meta strip
+  document.getElementById('mEvents').textContent = EVENTS.length + ' shortlisted';
+  document.getElementById('mStar').textContent = totalStar + ' of ' + EVENTS.length;
+
+  // footer
+  document.getElementById('plFootN').textContent = EVENTS.length;
+  document.getElementById('plFootStar').textContent = totalStar;
+  plFoot.classList.add('show');
+
+  // button → done state
+  btn.classList.remove('is-running'); btn.classList.add('is-done');
+  btn.disabled = false;
+  pbLabel.textContent = 'Re-run pipeline';
+  pbIc.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>';
+  running = false;
+  doneOnce = true;
+}
+
+function ensureAllRows(){
+  if(tbody.children.length < EVENTS.length){
+    for(let r=tbody.children.length; r<EVENTS.length; r++){
+      const e = EVENTS[r];
+      const tr = document.createElement('tr');
+      tr.className = 'rowlink';
+      tr.dataset.focus = e.focus;
+      tr.setAttribute('role','link'); tr.setAttribute('tabindex','0');
+      tr.setAttribute('aria-label', `${e.name} — open official site`);
+      const open = ()=> window.open(e.url,'_blank','noopener');
+      tr.addEventListener('click', open);
+      tr.addEventListener('keydown', ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); open(); }});
+      tr.innerHTML = rowHTML(e);
+      tbody.appendChild(tr);
+    }
+  }
+}
+
+function animateGauges(){
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      document.querySelectorAll('.gauge .fill').forEach(c=>{ c.style.strokeDashoffset = c.dataset.off; });
+    }, 80);
+  });
+}
+
+/* ---- filters ---- */
+function refreshCounts(){
+  const counts = EVENTS.reduce((a,e)=>{ a.all++; a[e.focus]++; return a; }, {all:0,ms:0,data:0,ind:0});
+  document.getElementById('ct-all').textContent  = counts.all;
+  document.getElementById('ct-ms').textContent   = counts.ms;
+  document.getElementById('ct-data').textContent = counts.data;
+  document.getElementById('ct-ind').textContent  = counts.ind;
+}
+function applyActiveFilter(){
+  const active = document.querySelector('.fbtn.active');
+  const f = active ? active.dataset.f : 'all';
+  document.querySelectorAll('#rows tr.rowlink').forEach(tr=>{
+    tr.classList.toggle('hidden', f!=='all' && tr.dataset.focus!==f);
+  });
+}
+document.getElementById('filters').addEventListener('click', ev=>{
+  const b = ev.target.closest('.fbtn'); if(!b) return;
+  document.querySelectorAll('.fbtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  applyActiveFilter();
+});
+
+/* jump to table */
+document.getElementById('plJump').addEventListener('click', ()=>{
+  document.querySelector('.table-scroll').scrollIntoView({behavior:'smooth', block:'start'});
+});
+
+/* wire the Process button */
+btn.addEventListener('click', runPipeline);
+
+/* init counts (grey until processed) */
+refreshCounts();
+</script>
+</body>
+</html>
