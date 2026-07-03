@@ -2,8 +2,7 @@ Autonomous event-shortlisting app for Techment Technology. Discovers U.S. tech a
 
 Single self-contained index.html — no build, no dependencies. Open it and press Process.
 
-Features
-
+##Features
 
 One-click pipeline — the Process button runs seven agents (Discovery → Extraction → Attendee Access → Scoring → Recommendation → Persistence → Search) with live progress feedback.
 Ranked shortlist — 14 events scored against techment.com, Microsoft-first (Ignite, AI Tour, FabCon lead).
